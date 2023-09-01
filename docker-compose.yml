@@ -1,7 +1,7 @@
 version: '3'
 
 networks:
-  laravel:
+  laravel_1:
 
 services:
   site:
@@ -11,35 +11,16 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
-    container_name: nginx
+    container_name: lara_nginx
     ports:
-      - 80:80
+      - 81:80
     volumes:
       - ./src:/var/www/html:delegated
     depends_on:
       - php
       - redis
-      - mysql
-      - mailhog
     networks:
-      - laravel
-
-  mysql:
-    image: mariadb:10.6
-    container_name: mysql
-    restart: unless-stopped
-    tty: true
-    ports:
-      - 3306:3306
-    environment:
-      MYSQL_DATABASE: homestead
-      MYSQL_USER: homestead
-      MYSQL_PASSWORD: secret
-      MYSQL_ROOT_PASSWORD: secret
-      SERVICE_TAGS: dev
-      SERVICE_NAME: mysql
-    networks:
-      - laravel
+      - laravel_1
 
   php:
     build:
@@ -48,20 +29,20 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
-    container_name: php
+    container_name: lara_php
     volumes:
       - ./src:/var/www/html:delegated
     networks:
-      - laravel
+      - laravel_1
 
   redis:
     image: redis:alpine
-    container_name: redis
+    container_name: lara_redis
     restart: unless-stopped
     ports:
       - 6379:6379
     networks:
-      - laravel
+      - laravel_1
 
   composer:
     build:
@@ -70,7 +51,7 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
-    container_name: composer
+    container_name: lara_composer
     volumes:
       - ./src:/var/www/html
     working_dir: /var/www/html
@@ -79,11 +60,11 @@ services:
     user: laravel
     entrypoint: ['composer', '--ignore-platform-reqs']
     networks:
-      - laravel
+      - laravel_1
 
   npm:
-    image: node:13.7
-    container_name: npm
+    image: node:lts-hydrogen
+    container_name: lara_npm
     volumes:
       - ./src:/var/www/html
     ports:
@@ -92,7 +73,7 @@ services:
     working_dir: /var/www/html
     entrypoint: ['npm']
     networks:
-      - laravel
+      - laravel_1
 
   artisan:
     build:
@@ -101,21 +82,10 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
-    container_name: artisan
+    container_name: lara_artisan
     volumes:
       - ./src:/var/www/html:delegated
-    depends_on:
-      - mysql
     working_dir: /var/www/html
     entrypoint: ['php', '/var/www/html/artisan']
     networks:
-      - laravel
-
-  mailhog:
-    image: mailhog/mailhog:latest
-    container_name: mailhog
-    ports:
-      - 1025:1025
-      - 8025:8025
-    networks:
-      - laravel
+      - laravel_1

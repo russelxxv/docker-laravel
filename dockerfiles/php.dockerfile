@@ -20,7 +20,29 @@ RUN sed -i "s/user = www-data/user = laravel/g" /usr/local/etc/php-fpm.d/www.con
 RUN sed -i "s/group = www-data/group = laravel/g" /usr/local/etc/php-fpm.d/www.conf
 RUN echo "php_admin_flag[log_errors] = on" >> /usr/local/etc/php-fpm.d/www.conf
 
+# RUN apk add curl-dev libxml2-dev
+# RUN apk add zlib-devel
+# RUN apk add --no-cache \
+#       freetype \
+#       libjpeg-turbo \
+#       libpng \
+#       freetype-dev \
+#       libjpeg-turbo-dev \
+#       libpng-dev \
+#     && docker-php-ext-configure gd \
+#       --with-freetype=/usr/include/ \
+#       --with-jpeg=/usr/include/ \
+#     && docker-php-ext-install -j$(nproc) gd \
+#     && docker-php-ext-enable gd \
+#     && apk del --no-cache \
+#       freetype-dev \
+#       libjpeg-turbo-dev \
+#       libpng-dev \
+#     && rm -rf /tmp/*
+
 RUN docker-php-ext-install pdo pdo_mysql
+# RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 xmlrpc
+# RUN docker-php-ext-install xmlrpc
 
 RUN mkdir -p /usr/src/php/ext/redis \
     && curl -L https://github.com/phpredis/phpredis/archive/5.3.4.tar.gz | tar xvz -C /usr/src/php/ext/redis --strip 1 \
