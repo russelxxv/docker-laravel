@@ -1,7 +1,7 @@
 version: '3'
 
 networks:
-  laravel_1:
+  rictms4b:
 
 services:
   site:
@@ -11,7 +11,7 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
-    container_name: lara_nginx
+    container_name: nginx_rictms4b
     ports:
       - 81:80
     volumes:
@@ -20,7 +20,7 @@ services:
       - php
       - redis
     networks:
-      - laravel_1
+      - rictms4b
 
   php:
     build:
@@ -29,20 +29,20 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
-    container_name: lara_php
+    container_name: php_rictms4b
     volumes:
       - ./src:/var/www/html:delegated
     networks:
-      - laravel_1
+      - rictms4b
 
   redis:
     image: redis:alpine
-    container_name: lara_redis
+    container_name: redis_rictms4b
     restart: unless-stopped
     ports:
       - 6379:6379
     networks:
-      - laravel_1
+      - rictms4b
 
   composer:
     build:
@@ -51,7 +51,7 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
-    container_name: lara_composer
+    container_name: composer_rictms4b
     volumes:
       - ./src:/var/www/html
     working_dir: /var/www/html
@@ -60,11 +60,11 @@ services:
     user: laravel
     entrypoint: ['composer', '--ignore-platform-reqs']
     networks:
-      - laravel_1
+      - rictms4b
 
   npm:
     image: node:lts-hydrogen
-    container_name: lara_npm
+    container_name: npm_rictms4b
     volumes:
       - ./src:/var/www/html
     ports:
@@ -73,7 +73,7 @@ services:
     working_dir: /var/www/html
     entrypoint: ['npm']
     networks:
-      - laravel_1
+      - rictms4b
 
   artisan:
     build:
@@ -82,10 +82,19 @@ services:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
-    container_name: lara_artisan
+    container_name: artisan_rictms4b
     volumes:
       - ./src:/var/www/html:delegated
     working_dir: /var/www/html
     entrypoint: ['php', '/var/www/html/artisan']
     networks:
-      - laravel_1
+      - rictms4b
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog_rictms4b
+    ports:
+      - 1025:1025
+      - 8025:8025
+    networks:
+      - rictms4b
