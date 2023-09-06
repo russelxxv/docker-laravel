@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +14,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+/**
+ * ############## Public routes
+ */
 Route::get('/', function () {
-    return view('welcome');
+    return view("index");
 });
+
+Route::get('/login', function () {
+    return view("login");
+})->name('login');
+
+Route::resource('register', RegisterController::class, ['only' => ['index', 'store']]);
+// Route::get('/register', function () {
+//     return view("register");
+// })->name('register');
+/**
+ * ###### End Public routes
+ */
